@@ -1,8 +1,8 @@
 
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { VitalSignsInput, AIPrediction } from '../types';
-import { GEMINI_MODEL_NAME } from '../constants'; const API_KEY = "AIzaSyDtGAPSF8dnFmyCZmm9-qQ38o6Jw78yS_k"; if (!API_KEY) { console.error("API_KEY environment variable is not set. AI features will not work.");
-} const ai = new GoogleGenAI({ apiKey: API_KEY}); export const analyzeHealthWithGemini = async (vitals: VitalSignsInput): Promise<{ success: boolean; analysis?: AIPrediction; message?: string }> => { if (!API_KEY) { return { success: false, message: "API Key is not configured. Cannot connect to AI service." }; } const prompt = `
+import { GEMINI_MODEL_NAME } from '../constants'; const API_KEY = "AIzaSyDtGAPSF8dnFmyCZmm9-qQ38o6Jw78yS_k"; if (!API_KEY) { console.error("");
+} const ai = new GoogleGenAI({ apiKey: API_KEY}); export const analyzeHealthWithGemini = async (vitals: VitalSignsInput): Promise<{ success: boolean; analysis?: AIPrediction; message?: string }> => { if (!API_KEY) { return { success: false, message: "" }; } const prompt = `
 As a medical AI assistant, analyze these vital signs and environmental factors. Provide a structured, comprehensive, and actionable health assessment.
 Base your analysis on established medical guidelines (e.g., WHO, AHA, etc. as applicable). Be precise, clinical, and empathetic. Vital Signs & Factors:
 - Systolic BP: ${vitals.systolic} mmHg
