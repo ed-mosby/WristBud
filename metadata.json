@@ -1,0 +1,5 @@
+{
+  "name": "AI Health Predictor",
+  "description": "A single-page application that uses Gemini AI to analyze vital signs (heart rate, blood pressure, oxygen level, body temperature, weather temperature, steps count) and predict potential health anomalies or conditions.",
+  "requestFramePermissions": []
+}
