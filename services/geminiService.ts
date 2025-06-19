@@ -1,91 +1,19 @@
 
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { VitalSignsInput, AIPrediction } from '../types';
-import { GEMINI_MODEL_NAME } from '../constants';
-
-const API_KEY = "AIzaSyDtGAPSF8dnFmyCZmm9-qQ38o6Jw78yS_k";
-
-if (!API_KEY) {
-  console.error("API_KEY environment variable is not set. AI features will not work.");
-  // In a real app, you might throw an error here or ensure the UI reflects this state.
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY || "MISSING_API_KEY_FALLBACK" }); // Fallback for type safety, but will fail if API_KEY is truly missing
-
-export const analyzeHealthWithGemini = async (vitals: VitalSignsInput): Promise<{ success: boolean; analysis?: AIPrediction; message?: string }> => {
-  if (!API_KEY || API_KEY === "MISSING_API_KEY_FALLBACK") {
-    return { success: false, message: "API Key is not configured. Cannot connect to AI service." };
-  }
-
-  const prompt = `
+import { GEMINI_MODEL_NAME } from '../constants'; const API_KEY = "AIzaSyDtGAPSF8dnFmyCZmm9-qQ38o6Jw78yS_k"; if (!API_KEY) { console.error("API_KEY environment variable is not set. AI features will not work.");
+} const ai = new GoogleGenAI({ apiKey: API_KEY}); export const analyzeHealthWithGemini = async (vitals: VitalSignsInput): Promise<{ success: boolean; analysis?: AIPrediction; message?: string }> => { if (!API_KEY) { return { success: false, message: "API Key is not configured. Cannot connect to AI service." }; } const prompt = `
 As a medical AI assistant, analyze these vital signs and environmental factors. Provide a structured, comprehensive, and actionable health assessment.
-Base your analysis on established medical guidelines (e.g., WHO, AHA, etc. as applicable). Be precise, clinical, and empathetic.
-
-Vital Signs & Factors:
+Base your analysis on established medical guidelines (e.g., WHO, AHA, etc. as applicable). Be precise, clinical, and empathetic. Vital Signs & Factors:
 - Systolic BP: ${vitals.systolic} mmHg
 - Diastolic BP: ${vitals.diastolic} mmHg
 - Heart Rate: ${vitals.heartRate} BPM
 - Oxygen Saturation (SpO2): ${vitals.oxygenLevel}%
 - Body Temperature: ${vitals.bodyTemperature}°C
 - Ambient Weather Temperature: ${vitals.weatherTemperature}°C
-- Daily Steps Count: ${vitals.stepsCount} steps
-
-Please provide your response in this exact JSON format:
+- Daily Steps Count: ${vitals.stepsCount} steps Please provide your response in this exact JSON format:
 \`\`\`json
-{
-  "overallStatus": "Normal|Warning|Critical",
-  "riskLevel": "Low|Moderate|High|Severe",
-  "confidence": 85,
-  "probabilities": {
-    "normal": 30,
-    "abnormal": 40,
-    "critical": 30
-  },
-  "vitalAnalysis": {
-    "bloodPressure": {
-      "status": "Normal|Elevated|High Stage 1|High Stage 2|Crisis|Low",
-      "concern": "Detailed clinical interpretation of blood pressure ${vitals.systolic}/${vitals.diastolic} mmHg, considering age group implications if possible (assume adult if not specified)."
-    },
-    "heartRate": {
-      "status": "Normal|Low (Bradycardia)|High (Tachycardia)",
-      "concern": "Detailed clinical interpretation of heart rate ${vitals.heartRate} BPM, including potential causes or implications of deviations."
-    },
-    "oxygenSaturation": {
-      "status": "Normal|Low (Hypoxemia)|Critical",
-      "concern": "Detailed clinical interpretation of SpO2 ${vitals.oxygenLevel}%, explaining ranges and potential urgency if abnormal."
-    },
-    "bodyTemperature": {
-      "status": "Normal|Fever (Hyperthermia)|Low (Hypothermia)",
-      "concern": "Detailed clinical interpretation of body temperature ${vitals.bodyTemperature}°C, covering implications of fever or hypothermia."
-    },
-    "weatherImpact": {
-      "value": "${vitals.weatherTemperature}°C",
-      "status": "Neutral|Cold Stress|Heat Stress|Optimal",
-      "concern": "Analysis of how ${vitals.weatherTemperature}°C ambient temperature might affect general well-being or exacerbate existing conditions, considering humidity if inferable (assume moderate otherwise)."
-    },
-    "activityLevel": {
-      "value": "${vitals.stepsCount} steps",
-      "status": "Sedentary|Lightly Active|Moderately Active|Active|Very Active",
-      "concern": "Assessment of ${vitals.stepsCount} daily steps in relation to general health guidelines and potential impact on reported vitals."
-    }
-  },
-  "keyFindings": [
-    "Most critical finding related to immediate health risk.",
-    "Second important observation regarding potential developing issues.",
-    "Noteworthy pattern or interaction between different vitals or factors.",
-    "Summary of overall physiological state based on data."
-  ],
-  "recommendations": [
-    { "type": "Consultation", "text": "Specific advice on when and why to consult a healthcare professional (e.g., 'Consult your doctor within 24-48 hours to discuss these findings.')." },
-    { "type": "Lifestyle", "text": "Actionable lifestyle adjustment (e.g., 'Increase daily fluid intake to 2-3 liters, especially in warm weather.')." },
-    { "type": "Dietary", "text": "A relevant dietary suggestion (e.g., 'Consider reducing sodium intake to help manage blood pressure.')." },
-    { "type": "Monitoring", "text": "Advice on self-monitoring (e.g., 'Monitor blood pressure daily for the next week.')." }
-  ],
-  "preventiveMeasures": [
-    "General preventive tip for maintaining good health based on inputs.",
-    "Another preventive measure relevant to the user's data profile."
-  ],
-  "urgency": "Routine|Monitor|Seek Care|Emergency"
+{ "overallStatus": "Normal|Warning|Critical", "riskLevel": "Low|Moderate|High|Severe", "confidence": 85, "probabilities": { "normal": 30, "abnormal": 40, "critical": 30 }, "vitalAnalysis": { "bloodPressure": { "status": "Normal|Elevated|High Stage 1|High Stage 2|Crisis|Low", "concern": "Detailed clinical interpretation of blood pressure ${vitals.systolic}/${vitals.diastolic} mmHg, considering age group implications if possible (assume adult if not specified)." }, "heartRate": { "status": "Normal|Low (Bradycardia)|High (Tachycardia)", "concern": "Detailed clinical interpretation of heart rate ${vitals.heartRate} BPM, including potential causes or implications of deviations." }, "oxygenSaturation": { "status": "Normal|Low (Hypoxemia)|Critical", "concern": "Detailed clinical interpretation of SpO2 ${vitals.oxygenLevel}%, explaining ranges and potential urgency if abnormal." }, "bodyTemperature": { "status": "Normal|Fever (Hyperthermia)|Low (Hypothermia)", "concern": "Detailed clinical interpretation of body temperature ${vitals.bodyTemperature}°C, covering implications of fever or hypothermia." }, "weatherImpact": { "value": "${vitals.weatherTemperature}°C", "status": "Neutral|Cold Stress|Heat Stress|Optimal", "concern": "Analysis of how ${vitals.weatherTemperature}°C ambient temperature might affect general well-being or exacerbate existing conditions, considering humidity if inferable (assume moderate otherwise)." }, "activityLevel": { "value": "${vitals.stepsCount} steps", "status": "Sedentary|Lightly Active|Moderately Active|Active|Very Active", "concern": "Assessment of ${vitals.stepsCount} daily steps in relation to general health guidelines and potential impact on reported vitals." } }, "keyFindings": [ "Most critical finding related to immediate health risk.", "Second important observation regarding potential developing issues.", "Noteworthy pattern or interaction between different vitals or factors.", "Summary of overall physiological state based on data." ], "recommendations": [ { "type": "Consultation", "text": "Specific advice on when and why to consult a healthcare professional (e.g., 'Consult your doctor within 24-48 hours to discuss these findings.')." }, { "type": "Lifestyle", "text": "Actionable lifestyle adjustment (e.g., 'Increase daily fluid intake to 2-3 liters, especially in warm weather.')." }, { "type": "Dietary", "text": "A relevant dietary suggestion (e.g., 'Consider reducing sodium intake to help manage blood pressure.')." }, { "type": "Monitoring", "text": "Advice on self-monitoring (e.g., 'Monitor blood pressure daily for the next week.')." } ], "preventiveMeasures": [ "General preventive tip for maintaining good health based on inputs.", "Another preventive measure relevant to the user's data profile." ], "urgency": "Routine|Monitor|Seek Care|Emergency"
 }
 \`\`\`
 Ensure all percentage values are numbers without the '%' sign.
@@ -97,56 +25,5 @@ The language should be professional but understandable to a layperson.
 Prioritize safety and always encourage consultation with a healthcare professional for diagnosis and treatment.
 If data is insufficient for a specific detailed point, state that clearly.
 For probabilities, ensure they sum to 100 or are reasonably distributed.
-`;
-
-  try {
-    const response: GenerateContentResponse = await ai.models.generateContent({
-      model: GEMINI_MODEL_NAME,
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      config: {
-        responseMimeType: "application/json",
-        temperature: 0.4, // Slightly increased for more nuanced explanations
-        // topP: 0.95, // Consider uncommenting if responses are too narrow
-        // topK: 40,   // Consider uncommenting with topP
-      }
-    });
-
-    let jsonStr = response.text.trim();
-    // More robust regex to catch JSON block, even with slight variations in backticks or language specifier
-    const fenceRegex = /^```(?:json)?\s*\n?([\s\S]*?)\n?\s*```$/s;
-    const match = jsonStr.match(fenceRegex);
-    if (match && match[1]) {
-      jsonStr = match[1].trim();
-    }
-    
-    // Attempt to parse, even if it's not perfectly clean (AI might miss a comma, etc.)
-    // Basic sanitization:
-    jsonStr = jsonStr.replace(/,\s*([}\]])/g, '$1'); // Remove trailing commas before closing brace/bracket
-
-    const analysisResult: AIPrediction = JSON.parse(jsonStr);
-    
-    // Basic validation of the parsed structure (optional but good practice)
-    if (!analysisResult.overallStatus || !analysisResult.probabilities || !analysisResult.vitalAnalysis) {
-        throw new Error("Parsed AI response is missing essential fields.");
-    }
-
-    return { success: true, analysis: analysisResult };
-
-  } catch (error: any) {
-    console.error("Gemini API Error or JSON Parsing Error:", error);
-    let errorMessage = "Failed to analyze health data with AI.";
-    if (error.message) {
-      errorMessage += ` Details: ${error.message}`;
-    }
-     if (typeof error.response?.text === 'function') { // Check if text() method exists
-        try {
-            const errorText = await error.response.text();
-            console.error("Raw error response from API:", errorText);
-            errorMessage += ` Raw API Response: ${errorText.substring(0, 200)}...`;
-        } catch (e) {
-            console.error("Could not get raw error text.");
-        }
-    }
-    return { success: false, message: errorMessage };
-  }
+`; try { const response: GenerateContentResponse = await ai.models.generateContent({ model: GEMINI_MODEL_NAME, contents: [{ role: "user", parts: [{ text: prompt }] }], config: { responseMimeType: "application/json", temperature: 0.4, } }); let jsonStr = response.text.trim(); const fenceRegex = /^```(?:json)?\s*\n?([\s\S]*?)\n?\s*```$/s; const match = jsonStr.match(fenceRegex); if (match && match[1]) { jsonStr = match[1].trim(); } jsonStr = jsonStr.replace(/,\s*([}\]])/g, '$1'); const analysisResult: AIPrediction = JSON.parse(jsonStr); if (!analysisResult.overallStatus || !analysisResult.probabilities || !analysisResult.vitalAnalysis) { throw new Error("Parsed AI response is missing essential fields."); } return { success: true, analysis: analysisResult }; } catch (error: any) { console.error("Gemini API Error or JSON Parsing Error:", error); let errorMessage = "Failed to analyze health data with AI."; if (error.message) { errorMessage += ` Details: ${error.message}`; } if (typeof error.response?.text === 'function') { try { const errorText = await error.response.text(); console.error("Raw error response from API:", errorText); errorMessage += ` Raw API Response: ${errorText.substring(0, 200)}...`; } catch (e) { console.error("Could not get raw error text."); } } return { success: false, message: errorMessage }; }
 };
