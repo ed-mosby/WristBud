@@ -1,32 +1,58 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+
 export default defineConfig({
   plugins: [react()],
   build: {
     outDir: "build",
-    sourcemap: !1,
+    sourcemap: false,
     minify: "terser",
     rollupOptions: {
       output: {
-        manualChunks: { vendor: ["react", "react-dom"], utils: ["axios"] },
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor';
+            }
+            if (id.includes('axios')) {
+              return 'utils';
+            }
+            if (id.includes('brain')) {
+              return 'ml';
+            }
+          }
+        },
       },
     },
   },
   server: {
     host: "0.0.0.0",
     port: 5173,
-    strictPort: !1,
+    strictPort: false,
     allowedHosts: ["localhost", "all"],
     hmr: { host: "localhost", protocol: "ws" },
     proxy: {
       "/api": {
         target: "http://localhost:5000",
-        changeOrigin: !0,
-        secure: !1,
+        changeOrigin: true,
+        secure: false,
         rewrite: (path) => path,
       },
     },
   },
-  define: { global: "globalThis" },
+  define: { 
+    global: "globalThis",
+    'process.env': {}
+  },
+  resolve: {
+    alias: {
+      stream: 'stream-browserify',
+      util: 'util',
+    },
+  },
+  optimizeDeps: {
+    include: ['brainjs'],
+    exclude: ['stream']
+  },
   preview: { host: "0.0.0.0", port: 7860 },
 });
