@@ -3,7 +3,7 @@ import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { VitalSignsInput, AIPrediction } from '../types';
 import { GEMINI_MODEL_NAME } from '../constants';
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = "AIzaSyDtGAPSF8dnFmyCZmm9-qQ38o6Jw78yS_k";
 
 if (!API_KEY) {
   console.error("API_KEY environment variable is not set. AI features will not work.");
